@@ -31,6 +31,14 @@ type launchPlanEndpointMetrics struct {
 	listIds    util.RequestMetrics
 }
 
+type namedEntityMetadataEndpointMetrics struct {
+	scope promutils.Scope
+
+	// create     util.RequestMetrics
+	update util.RequestMetrics
+	get    util.RequestMetrics
+}
+
 type nodeExecutionEndpointMetrics struct {
 	scope promutils.Scope
 
@@ -79,13 +87,14 @@ type AdminMetrics struct {
 	Scope        promutils.Scope
 	PanicCounter prometheus.Counter
 
-	executionEndpointMetrics     executionEndpointMetrics
-	launchPlanEndpointMetrics    launchPlanEndpointMetrics
-	nodeExecutionEndpointMetrics nodeExecutionEndpointMetrics
-	projectEndpointMetrics       projectEndpointMetrics
-	taskEndpointMetrics          taskEndpointMetrics
-	taskExecutionEndpointMetrics taskExecutionEndpointMetrics
-	workflowEndpointMetrics      workflowEndpointMetrics
+	executionEndpointMetrics           executionEndpointMetrics
+	launchPlanEndpointMetrics          launchPlanEndpointMetrics
+	namedEntityMetadataEndpointMetrics namedEntityMetadataEndpointMetrics
+	nodeExecutionEndpointMetrics       nodeExecutionEndpointMetrics
+	projectEndpointMetrics             projectEndpointMetrics
+	taskEndpointMetrics                taskEndpointMetrics
+	taskExecutionEndpointMetrics       taskExecutionEndpointMetrics
+	workflowEndpointMetrics            workflowEndpointMetrics
 }
 
 func InitMetrics(adminScope promutils.Scope) AdminMetrics {
@@ -113,6 +122,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:       util.NewRequestMetrics(adminScope, "list_launch_plan"),
 			listActive: util.NewRequestMetrics(adminScope, "list_active_launch_plans"),
 			listIds:    util.NewRequestMetrics(adminScope, "list_launch_plan_ids"),
+		},
+		namedEntityMetadataEndpointMetrics: namedEntityMetadataEndpointMetrics{
+			scope: adminScope,
+			// create:     util.NewRequestMetrics(adminScope, "create_launch_plan"),
+			update: util.NewRequestMetrics(adminScope, "update_named_entity_metadata"),
+			get:    util.NewRequestMetrics(adminScope, "get_named_entity_metadata"),
 		},
 		nodeExecutionEndpointMetrics: nodeExecutionEndpointMetrics{
 			scope:        adminScope,

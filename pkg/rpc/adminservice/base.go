@@ -5,37 +5,37 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	executionCluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
-
-	"github.com/lyft/flytestdlib/profutils"
-
+	"github.com/golang/protobuf/proto"
+	"github.com/lyft/flyteadmin/pkg/async/notifications"
 	"github.com/lyft/flyteadmin/pkg/async/schedule"
 	"github.com/lyft/flyteadmin/pkg/data"
-
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
-
-	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flytestdlib/logger"
-
-	"github.com/lyft/flyteadmin/pkg/async/notifications"
+	executionCluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/lyft/flyteadmin/pkg/manager/impl"
 	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories"
 	repositoryConfig "github.com/lyft/flyteadmin/pkg/repositories/config"
 	"github.com/lyft/flyteadmin/pkg/runtime"
 	workflowengine "github.com/lyft/flyteadmin/pkg/workflowengine/impl"
+	"github.com/lyft/flytestdlib/logger"
+	"github.com/lyft/flytestdlib/profutils"
+	"github.com/lyft/flytestdlib/promutils"
+	"github.com/lyft/flytestdlib/storage"
+
+	"github.com/lyft/flytestdlib/promutils"
+
+	"github.com/lyft/flytestdlib/storage"
 )
 
 type AdminService struct {
-	TaskManager          interfaces.TaskInterface
-	WorkflowManager      interfaces.WorkflowInterface
-	LaunchPlanManager    interfaces.LaunchPlanInterface
-	ExecutionManager     interfaces.ExecutionInterface
-	NodeExecutionManager interfaces.NodeExecutionInterface
-	TaskExecutionManager interfaces.TaskExecutionInterface
-	ProjectManager       interfaces.ProjectInterface
-	Metrics              AdminMetrics
+	TaskManager                interfaces.TaskInterface
+	WorkflowManager            interfaces.WorkflowInterface
+	LaunchPlanManager          interfaces.LaunchPlanInterface
+	ExecutionManager           interfaces.ExecutionInterface
+	NodeExecutionManager       interfaces.NodeExecutionInterface
+	TaskExecutionManager       interfaces.TaskExecutionInterface
+	ProjectManager             interfaces.ProjectInterface
+	NamedEntityMetadataManager interfaces.NamedEntityMetadataInterface
+	Metrics                    AdminMetrics
 }
 
 // Intercepts all admin requests to handle panics during execution.
