@@ -4,15 +4,13 @@ import (
 	"context"
 	"testing"
 
-	mockScope "github.com/lyft/flytestdlib/promutils"
-
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,6 +41,8 @@ func getMockWorkflowResponseFromDb(version string, typedInterface []byte) map[st
 	workflow["version"] = version
 	workflow["typed_interface"] = typedInterface
 	workflow["remote_closure_identifier"] = remoteSpecIdentifier
+	// Metadata would actually come from a JOIN in the real implementation
+	workflow["description"] = description
 	return workflow
 }
 
@@ -220,6 +220,8 @@ func TestListWorkflows_MissingParameters(t *testing.T) {
 	})
 	assert.Equal(t, err.Error(), "missing and/or invalid parameters: filters")
 }
+
+todo: Update test to check existence of descriptions. Make descriptions different.
 
 func TestListWorkflowIds(t *testing.T) {
 	workflowRepo := NewWorkflowRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())

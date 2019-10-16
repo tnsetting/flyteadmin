@@ -13,6 +13,7 @@ import (
 const project = "project"
 const domain = "domain"
 const name = "name"
+const description = "description"
 const version = "XYZ"
 
 func GetDbForTest(t *testing.T) *gorm.DB {

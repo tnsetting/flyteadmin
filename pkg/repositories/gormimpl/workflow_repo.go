@@ -3,14 +3,12 @@ package gormimpl
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/lyft/flytestdlib/promutils"
-
 	"github.com/jinzhu/gorm"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/promutils"
 )
 
 const workflowTableName = "workflows"
@@ -96,6 +94,8 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 	}
 
 	tx := r.db.Model(models.Workflow{}).Limit(input.Limit).Offset(input.Offset)
+
+	tx = tx.Joins(leftJoinWorkflowNameToMetadata)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)

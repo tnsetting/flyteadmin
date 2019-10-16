@@ -71,10 +71,12 @@ func FromWorkflowModels(workflowModels []models.Workflow) ([]*admin.Workflow, er
 func FromWorkflowModelsToIdentifiers(workflowModels []models.Workflow) []*admin.NamedEntityIdentifier {
 	ids := make([]*admin.NamedEntityIdentifier, len(workflowModels))
 	for i, wf := range workflowModels {
+		var metadata = FromNamedEntityMetadataFields(wf.Metadata)
 		ids[i] = &admin.NamedEntityIdentifier{
-			Project: wf.Project,
-			Domain:  wf.Domain,
-			Name:    wf.Name,
+			Project:  wf.Project,
+			Domain:   wf.Domain,
+			Name:     wf.Name,
+			Metadata: &metadata,
 		}
 	}
 

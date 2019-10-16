@@ -139,4 +139,14 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE executions DROP COLUMN IF EXISTS InputsURI, DROP COLUMN IF EXISTS UserInputsURI").Error
 		},
 	},
+	// Create named_entity_metadata table.
+	{
+		ID: "2019-10-15-named-entity-metadata",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.NamedEntityMetadata{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.DropTable("named_entity_metadata").Error
+		},
+	},
 }

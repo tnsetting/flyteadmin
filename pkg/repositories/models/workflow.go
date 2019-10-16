@@ -12,6 +12,7 @@ type WorkflowKey struct {
 type Workflow struct {
 	BaseModel
 	WorkflowKey
+	Metadata                NamedEntityMetadataFields
 	TypedInterface          []byte
 	RemoteClosureIdentifier string `gorm:"not null"`
 	LaunchPlans             []LaunchPlan

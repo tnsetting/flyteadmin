@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"google.golang.org/grpc/codes"
-
 	"github.com/lyft/flyteadmin/pkg/common"
 	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"google.golang.org/grpc/codes"
 )
 
 const Project = "project"
@@ -25,6 +25,7 @@ const DomainID = "domain_id"
 const DomainName = "domain_name"
 
 const executionTableName = "executions"
+const namedEntityMetadataTableName = "named_entity_metadata"
 const nodeExecutionTableName = "node_executions"
 const nodeExecutionEventTableName = "node_event_executions"
 const taskExecutionTableName = "task_executions"
@@ -59,6 +60,20 @@ var leftJoinTaskToTaskExec = fmt.Sprintf(
 		"%s.version = %s.version",
 	taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName,
 	taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName)
+
+// Creates a JOIN clause between a table which can hold NamedEntityIdentifiers
+// and the metadata associated between them. Metadata is optional, so a left
+// join is used.
+func CreateEntityMetadataJoin(entityTableName string, resourceType core.ResourceType) string {
+	return fmt.Sprintf(
+		"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND ", entityTableName, namedEntityMetadataTableName, resourceType, namedEntityMetadataTableName, entityTableName,
+		namedEntityMetadataTableName, entityTableName,
+		namedEntityMetadataTableName, entityTableName)
+}
+
+var leftJoinWorkflowNameToMetadata = CreateEntityMetadataJoin(workflowTableName, core.ResourceType_WORKFLOW)
+
+// TODO: joins for task/launchplan
 
 var entityToModel = map[common.Entity]interface{}{
 	common.Execution:          models.Execution{},
