@@ -117,6 +117,29 @@ func GetLaunchPlan(
 	return transformers.FromLaunchPlanModel(launchPlanModel)
 }
 
+func GetNamedEntityMetadataModel(
+	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntityMetadata, error) {
+	metadataModel, err := (repo).NamedEntityMetadataRepo().Get(ctx, repoInterfaces.GetNamedEntityMetadataInput{
+		ResourceType: resourceType,
+		Project: identifier.Project,
+		Domain:  identifier.Domain,
+		Name:    identifier.Name,
+	})
+	if err != nil {
+		return models.NamedEntityMetadata{}, err
+	}
+	return metadataModel, nil
+}
+
+func GetNamedEntityMetadata(
+	ctx context.Context, repo repositories.RepositoryInterface, resourceType core.ResourceType, identifier core.Identifier) (*admin.NamedEntityMetadata, error) {
+	metadataModel, err := GetNamedEntityMetadataModel(ctx, repo, resourceType, identifier)
+	if err != nil {
+		return nil, err
+	}
+	return transformers.FromNamedEntityMetadataModel(metadataModel)
+}
+
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan
 func GetActiveLaunchPlanVersionFilters(project, domain, name string) ([]common.InlineFilter, error) {
 	projectFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Project, project)

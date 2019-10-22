@@ -3,11 +3,10 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/lyft/flytestdlib/promutils"
-
 	"github.com/lyft/flyteadmin/pkg/repositories/config"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/lyft/flytestdlib/promutils"
 )
 
 type RepoConfig int32
@@ -31,6 +30,7 @@ type RepositoryInterface interface {
 	ProjectRepo() interfaces.ProjectRepoInterface
 	NodeExecutionRepo() interfaces.NodeExecutionRepoInterface
 	TaskExecutionRepo() interfaces.TaskExecutionRepoInterface
+	NamedEntityMetadataRepo() interfaces.NamedEntityMetadataRepoInterface
 }
 
 func GetRepository(repoType RepoConfig, dbConfig config.DbConfig, scope promutils.Scope) RepositoryInterface {

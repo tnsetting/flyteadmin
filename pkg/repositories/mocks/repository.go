@@ -6,13 +6,14 @@ import (
 )
 
 type MockRepository struct {
-	taskRepo          interfaces.TaskRepoInterface
-	workflowRepo      interfaces.WorkflowRepoInterface
-	launchPlanRepo    interfaces.LaunchPlanRepoInterface
-	executionRepo     interfaces.ExecutionRepoInterface
-	nodeExecutionRepo interfaces.NodeExecutionRepoInterface
-	projectRepo       interfaces.ProjectRepoInterface
-	taskExecutionRepo interfaces.TaskExecutionRepoInterface
+	taskRepo                interfaces.TaskRepoInterface
+	workflowRepo            interfaces.WorkflowRepoInterface
+	launchPlanRepo          interfaces.LaunchPlanRepoInterface
+	executionRepo           interfaces.ExecutionRepoInterface
+	nodeExecutionRepo       interfaces.NodeExecutionRepoInterface
+	projectRepo             interfaces.ProjectRepoInterface
+	taskExecutionRepo       interfaces.TaskExecutionRepoInterface
+	namedEntityMetadataRepo interfaces.NamedEntityMetadataRepoInterface
 }
 
 func (r *MockRepository) TaskRepo() interfaces.TaskRepoInterface {
@@ -43,14 +44,19 @@ func (r *MockRepository) TaskExecutionRepo() interfaces.TaskExecutionRepoInterfa
 	return r.taskExecutionRepo
 }
 
+func (r *MockRepository) NamedEntityMetadataRepo() interfaces.NamedEntityMetadataRepoInterface {
+	return r.namedEntityMetadataRepo
+}
+
 func NewMockRepository() repositories.RepositoryInterface {
 	return &MockRepository{
-		taskRepo:          NewMockTaskRepo(),
-		workflowRepo:      NewMockWorkflowRepo(),
-		launchPlanRepo:    NewMockLaunchPlanRepo(),
-		executionRepo:     NewMockExecutionRepo(),
-		nodeExecutionRepo: NewMockNodeExecutionRepo(),
-		projectRepo:       NewMockProjectRepo(),
-		taskExecutionRepo: NewMockTaskExecutionRepo(),
+		taskRepo:                NewMockTaskRepo(),
+		workflowRepo:            NewMockWorkflowRepo(),
+		launchPlanRepo:          NewMockLaunchPlanRepo(),
+		executionRepo:           NewMockExecutionRepo(),
+		nodeExecutionRepo:       NewMockNodeExecutionRepo(),
+		projectRepo:             NewMockProjectRepo(),
+		taskExecutionRepo:       NewMockTaskExecutionRepo(),
+		namedEntityMetadataRepo: NewMockNamedEntityMetadataRepo(),
 	}
 }

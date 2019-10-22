@@ -34,7 +34,6 @@ type launchPlanEndpointMetrics struct {
 type namedEntityMetadataEndpointMetrics struct {
 	scope promutils.Scope
 
-	// create     util.RequestMetrics
 	update util.RequestMetrics
 	get    util.RequestMetrics
 }
@@ -125,7 +124,6 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 		},
 		namedEntityMetadataEndpointMetrics: namedEntityMetadataEndpointMetrics{
 			scope: adminScope,
-			// create:     util.NewRequestMetrics(adminScope, "create_launch_plan"),
 			update: util.NewRequestMetrics(adminScope, "update_named_entity_metadata"),
 			get:    util.NewRequestMetrics(adminScope, "get_named_entity_metadata"),
 		},
