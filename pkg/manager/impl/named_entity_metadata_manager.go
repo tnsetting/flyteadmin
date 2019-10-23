@@ -15,7 +15,6 @@ import (
 
 type NamedEntityMetadataMetrics struct {
 	Scope promutils.Scope
-	// TODO: What metrics do we need to publish in this class?
 }
 
 type NamedEntityMetadataManager struct {
@@ -29,8 +28,8 @@ func (m *NamedEntityMetadataManager) UpdateNamedEntityMetadata(ctx context.Conte
 	// if err := validation.ValidateIdentifier(request.Id, common.NamedEntityMetadata); err != nil {
 	// 	logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.Id, err)
 	// }
-	metadataModel := transformers.CreateNamedEntityMetadataModel(request)
-	err = m.db.NamedEntityMetadataRepo().Update(ctx, metadataModel)
+	metadataModel := transformers.CreateNamedEntityMetadataModel(&request)
+	err := m.db.NamedEntityMetadataRepo().Update(ctx, metadataModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update named_entity_metadata for [%+v] with err %v", request.Id, err)
 		return nil, err
@@ -45,7 +44,7 @@ func (m *NamedEntityMetadataManager) GetNamedEntityMetadata(ctx context.Context,
 	// 	logger.Debugf(ctx, "can't get launch plan [%+v] with invalid identifier: %v", request.Id, err)
 	// 	return nil, err
 	// }
-	return util.GetNamedEntityMetadata(ctx, m.db, *request.Id)
+	return util.GetNamedEntityMetadata(ctx, m.db, request.ResourceType, *request.Id)
 }
 
 func NewNamedEntityMetadataManager(
@@ -55,15 +54,10 @@ func NewNamedEntityMetadataManager(
 
 	metrics := NamedEntityMetadataMetrics{
 		Scope: scope,
-		FailedScheduleUpdates: scope.MustNewCounter("failed_schedule_updates",
-			"count of unsuccessful attempts to update the schedules when updating launch plan version"),
-		SpecSizeBytes:    scope.MustNewSummary("spec_size_bytes", "size in bytes of serialized launch plan spec"),
-		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
 	}
 	return &NamedEntityMetadataManager{
-		db:        db,
-		config:    config,
-		scheduler: scheduler,
-		metrics:   metrics,
+		db:      db,
+		config:  config,
+		metrics: metrics,
 	}
 }

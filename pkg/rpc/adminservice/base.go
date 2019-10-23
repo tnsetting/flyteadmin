@@ -155,8 +155,9 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		WorkflowManager: manager.NewWorkflowManager(
 			db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
 			adminScope.NewSubScope("workflow_manager")),
-		LaunchPlanManager: launchPlanManager,
-		ExecutionManager:  executionManager,
+		LaunchPlanManager:          launchPlanManager,
+		ExecutionManager:           executionManager,
+		NamedEntityMetadataManager: manager.NewNamedEntityMetadataManager(db, configuration, adminScope.NewSubScope("named_entity_metadata_manager")),
 		NodeExecutionManager: manager.NewNodeExecutionManager(
 			db, adminScope.NewSubScope("node_execution_manager"), urlData),
 		TaskExecutionManager: manager.NewTaskExecutionManager(

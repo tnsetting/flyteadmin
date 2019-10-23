@@ -40,12 +40,12 @@ func (r *NamedEntityMetadataRepo) Get(ctx context.Context, input interfaces.GetN
 		},
 	}).First(&NamedEntityMetadata)
 	timer.Stop()
-	if tx.Error != nil {
-		return models.NamedEntityMetadata{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
 	// If a record is not found, we will return empty metadata
 	if tx.RecordNotFound() {
 		return models.NamedEntityMetadata{}, nil
+	}
+	if tx.Error != nil {
+		return models.NamedEntityMetadata{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return NamedEntityMetadata, nil
 }
@@ -54,7 +54,6 @@ func (r *NamedEntityMetadataRepo) Get(ctx context.Context, input interfaces.GetN
 func NewNamedEntityMetadataRepo(
 	db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) interfaces.NamedEntityMetadataRepoInterface {
 	metrics := newMetrics(scope)
-	// TODO: specialized metrics?
 
 	return &NamedEntityMetadataRepo{
 		db:               db,

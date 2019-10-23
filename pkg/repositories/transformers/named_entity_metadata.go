@@ -5,7 +5,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-func CreateNamedEntityMetadataModel(request *admin.NamedEntityMetadataUpdateRequest, NamedEntityMetadata *admin.NamedEntityMetadata) models.NamedEntityMetadata {
+func CreateNamedEntityMetadataModel(request *admin.NamedEntityMetadataUpdateRequest) models.NamedEntityMetadata {
 	return models.NamedEntityMetadata{
 		NamedEntityMetadataKey: models.NamedEntityMetadataKey{
 			ResourceType: request.ResourceType,
