@@ -19,8 +19,15 @@ type NamedEntityMetadataRepo struct {
 
 func (r *NamedEntityMetadataRepo) Update(ctx context.Context, input models.NamedEntityMetadata) error {
 	timer := r.metrics.UpdateDuration.Start()
-	// TODO: Check for existence, create if non-existent. Otherwise update.
-	tx := r.db.Update(&input)
+	var metadata models.NamedEntityMetadata
+	tx := r.db.Where(&models.NamedEntityMetadata{
+		NamedEntityMetadataKey: models.NamedEntityMetadataKey{
+			ResourceType: input.ResourceType,
+			Project:      input.Project,
+			Domain:       input.Domain,
+			Name:         input.Name,
+		},
+	}).Assign(input.NamedEntityMetadataFields).FirstOrCreate(&metadata)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)

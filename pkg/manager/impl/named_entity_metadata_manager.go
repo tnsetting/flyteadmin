@@ -28,6 +28,7 @@ func (m *NamedEntityMetadataManager) UpdateNamedEntityMetadata(ctx context.Conte
 	// if err := validation.ValidateIdentifier(request.Id, common.NamedEntityMetadata); err != nil {
 	// 	logger.Debugf(ctx, "can't update launch plan [%+v] state, invalid identifier: %v", request.Id, err)
 	// }
+	logger.Debugf(ctx, "Update metadata [%+v]", request)
 	metadataModel := transformers.CreateNamedEntityMetadataModel(&request)
 	err := m.db.NamedEntityMetadataRepo().Update(ctx, metadataModel)
 	if err != nil {
