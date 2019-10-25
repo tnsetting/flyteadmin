@@ -45,6 +45,10 @@ func (r *MockNamedEntityMetadataRepo) SetGetCallback(getFunction GetNamedEntityM
 	r.getFunction = getFunction
 }
 
+func (r *MockNamedEntityMetadataRepo) SetUpdateCallback(updateFunction UpdateNamedEntityMetadataFunc) {
+	r.updateFunction = updateFunction
+}
+
 func NewMockNamedEntityMetadataRepo() interfaces.NamedEntityMetadataRepoInterface {
 	return &MockNamedEntityMetadataRepo{}
 }

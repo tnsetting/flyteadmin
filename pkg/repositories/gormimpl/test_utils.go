@@ -2,6 +2,7 @@
 package gormimpl
 
 import (
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"fmt"
 	"testing"
 
@@ -14,6 +15,7 @@ const project = "project"
 const domain = "domain"
 const name = "name"
 const description = "description"
+const resourceType = core.ResourceType_WORKFLOW
 const version = "XYZ"
 
 func GetDbForTest(t *testing.T) *gorm.DB {

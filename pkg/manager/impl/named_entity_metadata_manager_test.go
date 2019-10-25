@@ -1,17 +1,32 @@
 package impl
 
 import (
+	"context"
+	"testing"
+
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/lyft/flyteadmin/pkg/repositories"
+	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/lyft/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
 )
 
-const project, domain, name, description = "project", "domain", "name", "description",
-
 var metadataIdentifier = admin.NamedEntityIdentifier{
-	ResourceType: core.ResourceType_WORKFLOW,
-	Project:      project,
-	Domain:       domain,
-	Name:         name,
+	Project: project,
+	Domain:  domain,
+	Name:    name,
+}
+
+var badIdentifier = admin.NamedEntityIdentifier{
+	Project: project,
+	Domain:  domain,
+	Name:    "",
 }
 
 func getMockRepositoryForNEMTest() repositories.RepositoryInterface {
@@ -25,107 +40,97 @@ func getMockConfigForNEMTest() runtimeInterfaces.Configuration {
 }
 
 func TestNamedEntityMetadataManager_GetMetadata(t *testing.T) {
-	// repository := getMockRepositoryForLpTest()
-	// lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
-	// state := int32(0)
-	// lpRequest := testutils.GetLaunchPlanRequest()
-	// workflowRequest := testutils.GetWorkflowRequest()
+	repository := getMockRepositoryForNEMTest()
+	manager := NewNamedEntityMetadataManager(repository, getMockConfigForNEMTest(), mockScope.NewTestScope())
 
-	// closure := admin.LaunchPlanClosure{
-	// 	ExpectedInputs:  lpRequest.Spec.DefaultInputs,
-	// 	ExpectedOutputs: workflowRequest.Spec.Template.Interface.Outputs,
-	// }
-	// specBytes, _ := proto.Marshal(lpRequest.Spec)
-	// closureBytes, _ := proto.Marshal(&closure)
-
-	// launchPlanGetFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
-	// 	return models.LaunchPlan{
-	// 		LaunchPlanKey: models.LaunchPlanKey{
-	// 			Project: input.Project,
-	// 			Domain:  input.Domain,
-	// 			Name:    input.Name,
-	// 			Version: input.Version,
-	// 		},
-	// 		Spec:       specBytes,
-	// 		Closure:    closureBytes,
-	// 		WorkflowID: 1,
-	// 		State:      &state,
-	// 	}, nil
-	// }
-	// repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(launchPlanGetFunc)
-	// response, err := lpManager.GetLaunchPlan(context.Background(), admin.ObjectGetRequest{
-	// 	Id: &launchPlanIdentifier,
-	// })
-	// assert.NoError(t, err)
-	// assert.NotNil(t, response)
+	metadataGetFunction := func(input interfaces.GetNamedEntityMetadataInput) (models.NamedEntityMetadata, error) {
+		return models.NamedEntityMetadata{
+			NamedEntityMetadataKey: models.NamedEntityMetadataKey{
+				ResourceType: input.ResourceType,
+				Project:      input.Project,
+				Domain:       input.Domain,
+				Name:         input.Name,
+			},
+			NamedEntityMetadataFields: models.NamedEntityMetadataFields{
+				Description: description,
+			},
+		}, nil
+	}
+	repository.NamedEntityMetadataRepo().(*repositoryMocks.MockNamedEntityMetadataRepo).SetGetCallback(metadataGetFunction)
+	response, err := manager.GetNamedEntityMetadata(context.Background(), admin.GetNamedEntityMetadataRequest{
+		ResourceType: resourceType,
+		Id:           &metadataIdentifier,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
 }
 
+func TestNamedEntityMetadataManager_GetMetadata_BadRequest(t *testing.T) {
+	repository := getMockRepositoryForNEMTest()
+	manager := NewNamedEntityMetadataManager(repository, getMockConfigForNEMTest(), mockScope.NewTestScope())
+
+	response, err := manager.GetNamedEntityMetadata(context.Background(), admin.GetNamedEntityMetadataRequest{
+		ResourceType: core.ResourceType_UNSPECIFIED,
+		Id:           &metadataIdentifier,
+	})
+	assert.Error(t, err)
+	assert.Nil(t, response)
+
+	response, err = manager.GetNamedEntityMetadata(context.Background(), admin.GetNamedEntityMetadataRequest{
+		ResourceType: resourceType,
+		Id:           &badIdentifier,
+	})
+	assert.Error(t, err)
+	assert.Nil(t, response)
+}
 
 func TestNamedEntityMetadataManager_Update(t *testing.T) {
-	// oldScheduleExpression := admin.Schedule{
-	// 	ScheduleExpression: &admin.Schedule_Rate{
-	// 		Rate: &admin.FixedRate{
-	// 			Value: 2,
-	// 			Unit:  admin.FixedRateUnit_HOUR,
-	// 		},
-	// 	},
-	// }
-	// oldLaunchPlanSpec := admin.LaunchPlanSpec{
-	// 	EntityMetadata: &admin.LaunchPlanMetadata{
-	// 		Schedule: &oldScheduleExpression,
-	// 	},
-	// }
-	// oldLaunchPlanSpecBytes, _ := proto.Marshal(&oldLaunchPlanSpec)
-	// newScheduleExpression := admin.Schedule{
-	// 	ScheduleExpression: &admin.Schedule_CronExpression{
-	// 		CronExpression: "cron",
-	// 	},
-	// }
-	// newLaunchPlanSpec := admin.LaunchPlanSpec{
-	// 	EntityMetadata: &admin.LaunchPlanMetadata{
-	// 		Schedule: &newScheduleExpression,
-	// 	},
-	// }
-	// newLaunchPlanSpecBytes, _ := proto.Marshal(&newLaunchPlanSpec)
-	// mockScheduler := mocks.NewMockEventScheduler()
-	// var removeCalled bool
-	// mockScheduler.(*mocks.MockEventScheduler).SetRemoveScheduleFunc(
-	// 	func(ctx context.Context, identifier admin.NamedEntityIdentifier) error {
-	// 		assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &identifier))
-	// 		removeCalled = true
-	// 		return nil
-	// 	})
-	// var addCalled bool
-	// mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
-	// 	func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
-	// 		assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
-	// 		assert.True(t, proto.Equal(&newScheduleExpression, &input.ScheduleExpression))
-	// 		addCalled = true
-	// 		return nil
-	// 	})
-	// repository := getMockRepositoryForLpTest()
-	// lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope())
-	// err := lpManager.(*LaunchPlanManager).updateSchedules(
-	// 	context.Background(),
-	// 	models.LaunchPlan{
-	// 		LaunchPlanKey: models.LaunchPlanKey{
-	// 			Project: project,
-	// 			Domain:  domain,
-	// 			Name:    name,
-	// 		},
-	// 		Spec: newLaunchPlanSpecBytes,
-	// 	},
-	// 	&models.LaunchPlan{
-	// 		LaunchPlanKey: models.LaunchPlanKey{
-	// 			Project: project,
-	// 			Domain:  domain,
-	// 			Name:    name,
-	// 		},
-	// 		Spec: oldLaunchPlanSpecBytes,
-	// 	})
-	// assert.Nil(t, err)
-	// assert.True(t, removeCalled)
-	// assert.True(t, addCalled)
+	repository := getMockRepositoryForNEMTest()
+	manager := NewNamedEntityMetadataManager(repository, getMockConfigForNEMTest(), mockScope.NewTestScope())
+	updatedDescription := "updated description"
+
+	metadataUpdateFunction := func(input models.NamedEntityMetadata) error {
+		assert.Equal(t, input.Description, updatedDescription)
+		assert.Equal(t, input.ResourceType, resourceType)
+		assert.Equal(t, input.Project, project)
+		assert.Equal(t, input.Domain, domain)
+		assert.Equal(t, input.Name, name)
+		return nil
+	}
+	repository.NamedEntityMetadataRepo().(*repositoryMocks.MockNamedEntityMetadataRepo).SetUpdateCallback(metadataUpdateFunction)
+	updatedMetadata := admin.NamedEntityMetadata{
+		Description: updatedDescription,
+	}
+	response, err := manager.UpdateNamedEntityMetadata(context.Background(), admin.NamedEntityMetadataUpdateRequest{
+		Metadata:     &updatedMetadata,
+		ResourceType: resourceType,
+		Id:           &metadataIdentifier,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
 }
 
-func TestNamedEntityMetadataManager_Update_BadRequest(t *testing.T) {}
+func TestNamedEntityMetadataManager_Update_BadRequest(t *testing.T) {
+	repository := getMockRepositoryForNEMTest()
+	manager := NewNamedEntityMetadataManager(repository, getMockConfigForNEMTest(), mockScope.NewTestScope())
+	updatedDescription := "updated description"
+
+	updatedMetadata := admin.NamedEntityMetadata{
+		Description: updatedDescription,
+	}
+	response, err := manager.UpdateNamedEntityMetadata(context.Background(), admin.NamedEntityMetadataUpdateRequest{
+		Metadata:     &updatedMetadata,
+		ResourceType: core.ResourceType_UNSPECIFIED,
+		Id:           &metadataIdentifier,
+	})
+	assert.Error(t, err)
+	assert.Nil(t, response)
+
+	response, err = manager.UpdateNamedEntityMetadata(context.Background(), admin.NamedEntityMetadataUpdateRequest{
+		Metadata:     &updatedMetadata,
+		ResourceType: resourceType,
+		Id:           &badIdentifier,
+	})
+	assert.Error(t, err)
+	assert.Nil(t, response)
+}

@@ -221,7 +221,7 @@ func TestListWorkflows_MissingParameters(t *testing.T) {
 	assert.Equal(t, err.Error(), "missing and/or invalid parameters: filters")
 }
 
-todo: Update test to check existence of descriptions. Make descriptions different.
+//TODO (randy): Update test to check existence of descriptions. Make descriptions different.
 
 func TestListWorkflowIds(t *testing.T) {
 	workflowRepo := NewWorkflowRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
